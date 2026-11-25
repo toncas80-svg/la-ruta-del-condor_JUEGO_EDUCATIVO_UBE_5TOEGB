@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>La Ruta del Cóndor: Exploradores del Ecuador | 5.º EGB</title>
+  <meta name="description" content="Aventura educativa interactiva sobre las regiones naturales, provincias, relieve y tradiciones del Ecuador para 5.º de EGB.">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Saltar al contenido principal</a>
+
+  <!-- Barra superior de estado y progreso -->
+  <header class="app-header" id="app-header" hidden>
+    <div class="header-inner">
+      <div class="brand-compact">
+        <div class="header-avatar" id="header-avatar" aria-hidden="true"></div>
+        <div>
+          <p class="header-title">La Ruta del Cóndor</p>
+          <p class="header-alias">Explorador: <strong id="header-alias-text">---</strong></p>
+        </div>
+      </div>
+
+      <div class="progress-summary" aria-label="Progreso general">
+        <div class="progress-text-row">
+          <span>Avance: <strong id="progress-percent">0%</strong></span>
+          <span>Puntaje: <strong id="header-score">0</strong> pts</span>
+          <span>Estrellas: <strong id="header-stars">0/12</strong> ★</span>
+        </div>
+        <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="global-progress-bar">
+          <div class="progress-fill" id="global-progress-fill" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button type="button" class="btn btn-outline btn-sm" id="btn-go-map" hidden>
+          Mapa del Ecuador
+        </button>
+        <button type="button" class="btn btn-outline btn-sm" id="btn-logout" title="Cambiar de explorador">
+          Salir
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content" class="app-main">
+    <!-- VISTA 1: PANTALLA DE INICIO SEGURO -->
+    <section id="view-login" class="view active" aria-labelledby="login-heading">
+      <div class="login-layout">
+        <div class="tupak-welcome-card">
+          <div class="tupak-stage" id="tupak-login-container" aria-hidden="true"></div>
+          <div class="speech-bubble" role="region" aria-label="Saludo de Tupak">
+            <p id="login-welcome-text">
+              ¡Hola, joven explorador o exploradora! Soy <strong>Tupak</strong>, el cóndor andino.
+              Le invito a recorrer las cuatro regiones naturales del Ecuador.
+              Para cuidar su privacidad, ingrese únicamente un <strong>alias o código de clase</strong>.
+            </p>
+            <button type="button" class="btn btn-speech btn-sm" data-speak-target="login-welcome-text">
+              <span class="icon-slot" data-icon="speaker" aria-hidden="true"></span>
+              Escuchar bienvenida
+            </button>
+          </div>
+        </div>
+
+        <form id="login-form" class="card login-card" novalidate>
+          <h1 id="login-heading" class="page-title">La Ruta del Cóndor</h1>
+          <p class="subtitle">Exploradores del Ecuador • Estudios Sociales 5.º EGB</p>
+
+          <div class="privacy-notice" role="note">
+            <span class="icon-slot" data-icon="shield" aria-hidden="true"></span>
+            <span><strong>Espacio seguro:</strong> No escriba su nombre real ni apellidos. Use solo su código o apodo de explorador.</span>
+          </div>
+
+          <div class="form-group">
+            <label for="input-alias" class="form-label">Código o alias de explorador</label>
+            <input
+              type="text"
+              id="input-alias"
+              class="form-input"
+              maxlength="20"
+              autocomplete="off"
+              placeholder="Ej. CONDOR-07 o JaguarAzul"
+              aria-describedby="alias-help alias-error"
+              required
+            >
+            <p id="alias-help" class="form-help">Entre 3 y 20 caracteres (letras, números o guiones).</p>
+            <p id="alias-error" class="form-error" role="alert" aria-live="polite"></p>
+          </div>
+
+          <fieldset class="form-group avatar-fieldset">
+            <legend class="form-label">Seleccione su avatar de aventura</legend>
+            <div class="avatar-grid" id="avatar-grid" role="radiogroup" aria-label="Avatares disponibles">
+              <!-- Generado dinámicamente con SVG inline desde main.js -->
+            </div>
+            <p id="avatar-error" class="form-error" role="alert" aria-live="polite"></p>
+          </fieldset>
+
+          <div class="adventure-options-box" role="region" aria-label="Configuración de clase (Docente)">
+            <div class="adventure-options-header">
+              <span class="icon-slot" data-icon="shield" aria-hidden="true"></span>
+              <h2 class="adventure-options-title">Configuración de clase (Docente)</h2>
+            </div>
+            <p class="adventure-options-desc">Ajuste las vidas iniciales y el cronómetro para la sesión de clase:</p>
+            <div class="adventure-options-grid">
+              <div class="form-group-compact">
+                <label class="form-label-sm" id="lives-control-label">Vidas iniciales (1 a 10)</label>
+                <div class="stepper-control" role="group" aria-labelledby="lives-control-label">
+                  <button type="button" class="btn-stepper" id="btn-lives-minus" aria-label="Disminuir vidas">−</button>
+                  <span class="stepper-display" id="lives-display">3 vidas</span>
+                  <button type="button" class="btn-stepper" id="btn-lives-plus" aria-label="Aumentar vidas">+</button>
+                </div>
+                <div class="stepper-quick-toggle">
+                  <label class="checkbox-label" for="check-lives-unlimited">
+                    <input type="checkbox" id="check-lives-unlimited">
+                    <span>Sin límite de vidas</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-group-compact">
+                <label for="select-time-limit" class="form-label-sm">Cronómetro por pregunta</label>
+                <select id="select-time-limit" class="form-select">
+                  <option value="0">Sin límite de tiempo</option>
+                  <option value="20">20 segundos</option>
+                  <option value="30" selected>30 segundos (recomendado)</option>
+                  <option value="45">45 segundos</option>
+                  <option value="60">60 segundos</option>
+                </select>
+                <p class="form-help-sm">Resaltará cuando falten 5 segundos o menos.</p>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-lg btn-block">
+            ¡Comenzar la expedición!
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- VISTA 2: MAPA PRINCIPAL INTERACTIVO DEL ECUADOR (12 ESTACIONES) -->
+    <section id="view-map" class="view" hidden aria-labelledby="map-heading">
+      <div class="map-header-bar">
+        <div>
+          <h1 id="map-heading" class="section-title">Camino de Expedición: 12 Estaciones del Ecuador</h1>
+          <p id="map-instruction" class="section-subtitle">
+            Avance estación por estación siguiendo el sendero desde la Costa hasta Galápagos. Haga clic en su estación activa para responder el reto.
+          </p>
+        </div>
+        <button type="button" class="btn btn-speech" data-speak-target="map-instruction">
+          <span class="icon-slot" data-icon="speaker" aria-hidden="true"></span>
+          Escuchar indicación
+        </button>
+      </div>
+
+      <div class="map-fullscreen-stage">
+        <div class="tupak-mini-guide">
+          <div class="tupak-mini-avatar" id="tupak-map-container" aria-hidden="true"></div>
+          <p id="tupak-map-tip" class="tupak-tip-text">
+            ¡Excelente inicio! Avance estación por estación desde la Costa hasta Galápagos.
+          </p>
+        </div>
+
+        <!-- Mapa SVG interactivo a ancho completo -->
+        <div class="card map-canvas-card map-canvas-full">
+          <nav id="region-tabs-nav" class="region-tabs-nav" aria-label="Menú compacto de regiones del Ecuador"></nav>
+          <div id="ecuador-map-container" class="ecuador-map-container" role="region" aria-label="Camino serpenteante de 12 estaciones por las 4 regiones del Ecuador">
+            <!-- SVG inline generado por svg-assets.js -->
+          </div>
+          <div class="map-legend" aria-label="Leyenda del camino">
+            <span class="legend-item"><span class="dot dot-available"></span> Estación Activa</span>
+            <span class="legend-item"><span class="dot dot-completed"></span> Completada (★)</span>
+            <span class="legend-item"><span class="dot dot-locked"></span> Bloqueada</span>
+          </div>
+        </div>
+
+        <!-- Bloque inferior limpio de insignias y certificado -->
+        <div class="card badges-panel badges-bottom-panel">
+          <div class="badges-bottom-header">
+            <h2 class="badges-title">Mis Insignias Regionales</h2>
+            <button type="button" class="btn btn-accent" id="btn-open-summary" hidden>
+              Ver Certificado y Resultados Finales
+            </button>
+          </div>
+          <div class="badges-grid" id="map-badges-grid">
+            <!-- 4 insignias SVG inline -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VISTA 3: PANTALLA DE NIVEL / PREGUNTAS -->
+    <section id="view-level" class="view" hidden aria-labelledby="level-title">
+      <div class="level-scene-banner level-scene-compact" id="level-scene-banner">
+        <!-- Paisaje vectorial SVG inline de la región activa -->
+        <div class="scene-svg-bg" id="scene-svg-bg" aria-hidden="true"></div>
+        <div class="scene-overlay-content scene-overlay-compact">
+          <div class="scene-compact-left">
+            <span class="scene-badge-pill" id="level-region-pill">Estación 1 de 12</span>
+            <h1 id="level-title" class="scene-title">Región Costa</h1>
+          </div>
+          <p id="level-subtitle" class="scene-subtitle">Litoral del Pacífico</p>
+        </div>
+      </div>
+
+      <!-- Mini-sendero horizontal compacto con avance del avatar -->
+      <div id="mini-trail-bar" class="mini-trail-bar card" aria-label="Avance en el camino de 12 estaciones"></div>
+
+      <div class="level-question-layout">
+        <div class="question-card card question-card-compact">
+          <div class="question-top-bar">
+            <div class="question-meta-pills">
+              <span class="question-counter" id="question-counter">Reto 1 de 3</span>
+              <span class="hud-pill" id="hud-timer" hidden aria-live="off"></span>
+              <span class="hud-pill" id="hud-lives" hidden aria-live="polite"></span>
+            </div>
+            <button type="button" class="btn btn-speech btn-sm" id="btn-speak-question">
+              <span class="icon-slot" data-icon="speaker" aria-hidden="true"></span>
+              Escuchar pregunta
+            </button>
+          </div>
+
+          <h2 id="question-text" class="question-text">
+            Lea con atención...
+          </h2>
+
+          <div class="options-list" id="options-list" role="radiogroup" aria-labelledby="question-text">
+            <!-- Opciones generadas dinámicamente -->
+          </div>
+
+          <!-- Caja de retroalimentación inmediata -->
+          <div id="feedback-box" class="feedback-box" hidden role="status" aria-live="polite">
+            <div class="feedback-header">
+              <span id="feedback-badge" class="feedback-badge"></span>
+              <button type="button" class="btn btn-speech btn-xs" id="btn-speak-feedback">
+                <span class="icon-slot" data-icon="speaker" aria-hidden="true"></span>
+                Escuchar mensaje
+              </button>
+            </div>
+            <p id="feedback-message" class="feedback-message"></p>
+            <div id="cultural-fact-box" class="cultural-fact-box" hidden>
+              <strong>Dato cultural de Tupak:</strong>
+              <span id="cultural-fact-text"></span>
+            </div>
+          </div>
+
+          <div class="question-actions">
+            <button type="button" class="btn btn-outline" id="btn-back-to-map">
+              Volver al mapa
+            </button>
+            <button type="button" class="btn btn-primary btn-lg" id="btn-submit-answer" disabled>
+              Comprobar respuesta
+            </button>
+            <button type="button" class="btn btn-accent btn-lg" id="btn-retry-station" hidden>
+              Intentar de nuevo
+            </button>
+            <button type="button" class="btn btn-secondary btn-lg" id="btn-next-question" hidden>
+              Siguiente pregunta
+            </button>
+          </div>
+        </div>
+
+        <aside class="tupak-companion-panel card">
+          <div id="tupak-level-container" class="tupak-level-svg" aria-hidden="true"></div>
+          <div class="tupak-companion-speech">
+            <p id="tupak-level-status">
+              ¡Estoy volando junto a usted! Lea con calma cada opción antes de elegir.
+            </p>
+          </div>
+          <div class="level-stars-preview" aria-label="Estrellas obtenidas en este nivel">
+            <span class="stars-label">Estrellas del nivel:</span>
+            <div id="level-stars-display" class="stars-row">☆☆☆</div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- VISTA 4: RESUMEN FINAL, INSIGNIAS Y EXPORTACIÓN -->
+    <section id="view-summary" class="view" hidden aria-labelledby="summary-heading">
+      <div class="card summary-card">
+        <div class="summary-hero">
+          <div id="tupak-summary-container" class="tupak-summary-svg" aria-hidden="true"></div>
+          <div>
+            <h1 id="summary-heading" class="section-title">¡Expedición Completada!</h1>
+            <p id="summary-message" class="section-subtitle">
+              Felicitaciones, explorador. Ha recorrido las cuatro regiones naturales del Ecuador.
+            </p>
+            <button type="button" class="btn btn-speech btn-sm" data-speak-target="summary-message">
+              <span class="icon-slot" data-icon="speaker" aria-hidden="true"></span>
+              Escuchar felicitación
+            </button>
+          </div>
+        </div>
+
+        <div class="summary-metrics-grid">
+          <div class="metric-box">
+            <span class="metric-label">Alias del Explorador</span>
+            <strong class="metric-value" id="summary-alias">---</strong>
+          </div>
+          <div class="metric-box">
+            <span class="metric-label">Puntaje Total</span>
+            <strong class="metric-value" id="summary-score">0 pts</strong>
+          </div>
+          <div class="metric-box">
+            <span class="metric-label">Estrellas Obtenidas</span>
+            <strong class="metric-value" id="summary-stars">0 / 12 ★</strong>
+          </div>
+          <div class="metric-box">
+            <span class="metric-label">Insignias Regionales</span>
+            <strong class="metric-value" id="summary-badges-count">0 / 4</strong>
+          </div>
+        </div>
+
+        <div class="summary-section">
+          <h2>Detalle por Región Natural</h2>
+          <div class="table-responsive">
+            <table class="summary-table">
+              <thead>
+                <tr>
+                  <th>Región</th>
+                  <th>Aciertos</th>
+                  <th>Puntaje</th>
+                  <th>Estrellas</th>
+                  <th>Insignia</th>
+                </tr>
+              </thead>
+              <tbody id="summary-table-body">
+                <!-- Generado dinámicamente -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="summary-section">
+          <h2>Colección de Insignias del Ecuador</h2>
+          <div class="badges-grid badges-grid-large" id="summary-badges-grid">
+            <!-- 4 insignias SVG inline -->
+          </div>
+        </div>
+
+        <!-- CERTIFICADO DE HONOR IMPRIMIBLE EN PDF -->
+        <div class="summary-section certificate-preview-section">
+          <div class="certificate-section-header">
+            <h2>Certificado de Honor de la Expedición</h2>
+            <p class="section-subtitle">
+              Diploma oficial que acredita su recorrido y aprendizajes por las cuatro regiones del Ecuador.
+            </p>
+          </div>
+
+          <div id="certificate-wrapper" class="certificate-wrapper" role="region" aria-label="Certificado de Honor de la Expedición">
+            <div class="certificate-outer-frame">
+              <div class="certificate-inner-frame">
+                <!-- Esquinas ornamentales -->
+                <span class="cert-corner cert-corner-tl" aria-hidden="true">✦</span>
+                <span class="cert-corner cert-corner-tr" aria-hidden="true">✦</span>
+                <span class="cert-corner cert-corner-bl" aria-hidden="true">✦</span>
+                <span class="cert-corner cert-corner-br" aria-hidden="true">✦</span>
+
+                <header class="cert-header">
+                  <div class="cert-figure cert-figure-left" id="cert-tupak-slot" aria-hidden="true"></div>
+                  <div class="cert-titles">
+                    <div class="cert-flag-stripe" aria-hidden="true">
+                      <span class="stripe-yellow"></span>
+                      <span class="stripe-blue"></span>
+                      <span class="stripe-red"></span>
+                    </div>
+                    <span class="cert-subheading">REPÚBLICA DEL ECUADOR • ESTUDIOS SOCIALES (5.º EGB)</span>
+                    <h1 class="cert-main-title">DIPLOMA DE HONOR</h1>
+                    <p class="cert-program-subtitle">EXPEDICIÓN «LA RUTA DEL CÓNDOR»</p>
+                  </div>
+                  <div class="cert-figure cert-figure-right" id="cert-avatar-slot" aria-hidden="true"></div>
+                </header>
+
+                <div class="cert-body">
+                  <p class="cert-awarded-text">
+                    El proyecto pedagógico confiere con gran orgullo la presente distinción de honor a:
+                  </p>
+                  <div class="cert-alias-box">
+                    <span id="cert-alias" class="cert-alias-text">---</span>
+                  </div>
+                  <p class="cert-merit-text">
+                    Por haber demostrado excelencia, curiosidad geográfica y profundo respeto hacia nuestro país,
+                    completando con éxito los retos de la <strong>Región Costa</strong>, la <strong>Región Sierra</strong>,
+                    la <strong>Región Amazónica</strong> y la <strong>Región Insular de Galápagos</strong>.
+                  </p>
+                </div>
+
+                <div class="cert-details-grid">
+                  <div class="cert-detail-card">
+                    <span class="cert-detail-label">Puntaje Total</span>
+                    <strong class="cert-detail-value" id="cert-score">0 / 120 pts</strong>
+                  </div>
+                  <div class="cert-detail-card">
+                    <span class="cert-detail-label">Estrellas del Sendero</span>
+                    <strong class="cert-detail-value" id="cert-stars">0 / 12 ★</strong>
+                  </div>
+                  <div class="cert-detail-card">
+                    <span class="cert-detail-label">Insignias Regionales</span>
+                    <strong class="cert-detail-value" id="cert-badges-count">4 de 4</strong>
+                  </div>
+                  <div class="cert-detail-card">
+                    <span class="cert-detail-label">Fecha de Culminación</span>
+                    <strong class="cert-detail-value" id="cert-date">-- de -- de ----</strong>
+                  </div>
+                </div>
+
+                <div class="cert-badges-section">
+                  <span class="cert-badges-caption">Insignias Regionales Desbloqueadas:</span>
+                  <div class="cert-badges-grid" id="cert-badges-grid">
+                    <!-- 4 insignias regionales SVG -->
+                  </div>
+                </div>
+
+                <footer class="cert-footer">
+                  <div class="cert-signature-block">
+                    <div class="cert-sign-line"></div>
+                    <span class="cert-sign-title">Docente de Aula</span>
+                    <span class="cert-sign-meta">5.º de Educación General Básica</span>
+                  </div>
+                  <div class="cert-seal-wrap">
+                    <div class="cert-official-seal" aria-label="Sello oficial de expedición culminada">
+                      <span class="seal-star">★ ★ ★</span>
+                      <strong>ECUADOR</strong>
+                      <small>EXPEDICIÓN CULMINADA</small>
+                    </div>
+                  </div>
+                  <div class="cert-signature-block">
+                    <div class="cert-sign-line"></div>
+                    <span class="cert-sign-title">Tupak el Cóndor</span>
+                    <span class="cert-sign-meta">Guía de las Cuatro Regiones</span>
+                  </div>
+                </footer>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="summary-actions">
+          <button type="button" class="btn btn-accent btn-lg" id="btn-print-certificate">
+            <span class="icon-slot" data-icon="shield" aria-hidden="true"></span>
+            Imprimir o guardar certificado (PDF)
+          </button>
+          <button type="button" class="btn btn-primary btn-lg" id="btn-download-csv">
+            Descargar resultados (CSV)
+          </button>
+          <button type="button" class="btn btn-secondary btn-lg" id="btn-download-json">
+            Descargar resultados (JSON)
+          </button>
+          <a href="#" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-lg" id="btn-survey-link">
+            Ir a la encuesta de satisfacción
+          </a>
+        </div>
+
+        <div class="summary-footer-nav">
+          <button type="button" class="btn btn-outline" id="btn-summary-back-map">
+            Volver al Mapa del Ecuador
+          </button>
+          <button type="button" class="btn btn-outline" id="btn-restart-expedition">
+            Reiniciar aventura
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODAL FLOTANTE DE RETROALIMENTACIÓN Y CELEBRACIÓN -->
+    <div id="celebration-modal" class="celebration-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="celebration-title">
+      <div id="celebration-card" class="celebration-card card">
+        <div id="celebration-sparkles" class="celebration-sparkles" aria-hidden="true"></div>
+        <div id="celebration-visual" class="celebration-visual" aria-hidden="true"></div>
+        <h2 id="celebration-title" class="celebration-title">¡Excelente!</h2>
+        <p id="celebration-text" class="celebration-text"></p>
+        <div id="celebration-cultural-box" class="cultural-fact-box celebration-cultural-box" hidden>
+          <strong>Dato cultural de Tupak:</strong>
+          <span id="celebration-cultural-text"></span>
+        </div>
+        <div class="celebration-actions">
+          <button type="button" class="btn btn-speech" id="btn-speak-celebration">
+            <span class="icon-slot" data-icon="speaker" aria-hidden="true"></span>
+            Escuchar mensaje
+          </button>
+          <button type="button" class="btn btn-primary btn-lg" id="btn-celebration-continue">
+            Continuar
+          </button>
+          <button type="button" class="btn btn-outline" id="btn-celebration-back-map" hidden>
+            Volver al mapa
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Configuración opcional inyectada por entorno (Netlify / Supabase) -->
+  <script>
+    window.__ENV__ = window.__ENV__ || {};
+    window.RutaCondor = window.RutaCondor || {};
+  </script>
+  <script defer src="js/svg-assets.js"></script>
+  <script defer src="js/data.js"></script>
+  <script defer src="js/speech.js"></script>
+  <script defer src="js/storage.js"></script>
+  <script defer src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+/* ==========================================================================
+   ANIMACIONES SUAVES PARA TUPAK Y ELEMENTOS INTERACTIVOS
+   ========================================================================== */
+
+@keyframes tupakFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+@keyframes tupakWingLeft {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-7deg);
+  }
+}
+
+@keyframes tupakWingRight {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(7deg);
+  }
+}
+
+@keyframes scarfWave {
+  0%, 100% {
+    transform: rotate(0deg) skewX(0deg);
+  }
+  50% {
+    transform: rotate(3deg) skewX(-3deg);
+  }
+}
+
+@keyframes mapPulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 0 rgba(244, 180, 0, 0));
+  }
+  50% {
+    filter: drop-shadow(0 0 8px rgba(244, 180, 0, 0.75));
+  }
+}
+
+.tupak-svg {
+  animation: tupakFloat 3.6s ease-in-out infinite;
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.tupak-wing-left {
+  transform-box: fill-box;
+  transform-origin: right center;
+  animation: tupakWingLeft 2.4s ease-in-out infinite;
+}
+
+.tupak-wing-right {
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: tupakWingRight 2.4s ease-in-out infinite;
+}
+
+.tupak-scarf-tail {
+  transform-box: fill-box;
+  transform-origin: top left;
+  animation: scarfWave 2.8s ease-in-out infinite;
+}
+
+.map-region-group[data-status="available"],
+.trail-station-node[data-status="available"] circle {
+  animation: mapPulse 2.6s ease-in-out infinite;
+}
+
+@keyframes celebrationPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.88) translateY(14px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes timerAlertPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(176, 42, 26, 0);
+  }
+  50% {
+    transform: scale(1.06);
+    box-shadow: 0 0 10px rgba(176, 42, 26, 0.4);
+  }
+}
+
+.trail-avatar-walker {
+  transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.trail-avatar-marker {
+  animation: tupakFloat 2.8s ease-in-out infinite;
+}
+
+.celebration-card {
+  animation: celebrationPop 0.28s ease-out both;
+}
+
+.celebration-sparkles {
+  animation: tupakFloat 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tupak-svg,
+  .tupak-wing-left,
+  .tupak-wing-right,
+  .tupak-scarf-tail,
+  .map-region-group[data-status="available"],
+  .trail-station-node[data-status="available"] circle,
+  .trail-avatar-walker,
+  .trail-avatar-marker,
+  .celebration-card,
+  .celebration-sparkles,
+  .hud-pill.hud-pill-danger {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .btn,
+  .option-btn,
+  .progress-fill {
+    transition: none !important;
+  }
+}
